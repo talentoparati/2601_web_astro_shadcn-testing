@@ -1,14 +1,30 @@
 ---
 import '../styles/global.css';
-// Component Imports
-// import Button from '../components/Button.astro';
-
+import { ModeToggle } from '@/components/ModeToggle';
 import { Button } from "@/components/ui/button"
 
-
-// Full Astro Component Syntax:
-// https://docs.astro.build/basics/astro-components/
 ---
+<!-- Dark Mode Script for shadcn-ui
+https://ui.shadcn.com/docs/dark-mode/astro -->
+
+<script is:inline>
+	const getThemePreference = () => {
+		if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+			return localStorage.getItem('theme');
+		}
+		return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+	};
+	const isDark = getThemePreference() === 'dark';
+	document.documentElement.classList[isDark ? 'add' : 'remove']('dark');
+
+	if (typeof localStorage !== 'undefined') {
+		const observer = new MutationObserver(() => {
+			const isDark = document.documentElement.classList.contains('dark');
+			localStorage.setItem('theme', isDark ? 'dark' : 'light');
+		});
+		observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+	}
+</script>
 
 <html lang="en">
 	<head>
@@ -16,12 +32,16 @@ import { Button } from "@/components/ui/button"
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro + TailwindCSS</title>
+		<title>Astro + shadcn-ui + TailwindCSS</title>
 	</head>
 
 	<body>
-		<div class="grid place-items-center h-screen content-center">
-			<Button>Tailwind Button in Astro!</Button>
+		<div class="flex items-center justify-evenly h-screen content-center">
+			<h1>
+				Astro + shadcn-ui + TailwindCSS
+			</h1>
+			<Button>shadcn-ui in Astro!</Button>
+			<ModeToggle client:load />
 			<a href="/markdown-page" class="p-4 underline">Markdown is also supported...</a>
 		</div>
 	</body>
